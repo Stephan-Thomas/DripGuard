@@ -93,7 +93,7 @@ export async function runDripGuard(options: RunDripGuardOptions = {}): Promise<D
   });
 
   // 3. Resolve canonical projects
-  const allowNetwork = options.allowNetwork ?? (options.provider === 'live');
+  const allowNetwork = options.allowNetwork ?? (options.provider !== 'mock');
   const resolver = new DependencyResolver({
     allowNetwork,
     config
@@ -113,14 +113,12 @@ export async function runDripGuard(options: RunDripGuardOptions = {}): Promise<D
     }
   }
 
-  // 5. Initialize Drips provider
+  // 5. Initialize Drips provider (Default is LIVE; mock is explicitly opt-in)
   let provider: DripsFundingProvider;
   if (typeof options.provider === 'object' && options.provider !== null) {
     provider = options.provider;
-  } else if (options.provider === 'live') {
-    provider = new LiveDripsFundingProvider();
-  } else {
-    // Default mock provider: creates realistic fixtures matching the target project
+  } else if (options.provider === 'mock') {
+    // Explicit opt-in mock provider
     const defaultFunded = resolved
       .filter(r => r.project && !r.dependency.name.includes('unfunded') && !r.dependency.name.includes('opentelemetry'))
       .map(r => `${r.project!.owner}/${r.project!.repository}`);
@@ -128,6 +126,9 @@ export async function runDripGuard(options: RunDripGuardOptions = {}): Promise<D
     provider = new MockDripsFundingProvider({
       fundedRepos: defaultFunded
     });
+  } else {
+    // Default in production is LIVE
+    provider = new LiveDripsFundingProvider();
   }
 
   // 6. Query Drips funding data

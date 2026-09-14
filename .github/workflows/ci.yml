@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
-    name: Build, Lint & Test
+    name: Build, Lint, Test & Dist Check
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +29,7 @@ jobs:
           version: 11.9.0
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck
         run: pnpm typecheck
@@ -34,8 +37,24 @@ jobs:
       - name: Run test suite
         run: pnpm test
 
-      - name: Build bundle
+      - name: Build and bundle action
         run: pnpm build
 
-      - name: Self-dogfooding DripGuard Check
+      - name: Verify dist/action.cjs consistency
+        run: |
+          git status --porcelain dist/action.cjs
+          if [ -n "$(git status --porcelain dist/action.cjs)" ]; then
+            echo "::error::dist/action.cjs is out of sync with src/. Run 'pnpm build' and commit the result."
+            git diff dist/action.cjs
+            exit 1
+          fi
+
+      - name: Self-dogfooding CLI Check
         run: node bin/dripguard.js check --mock
+
+      - name: Dogfood GitHub Action locally
+        uses: ./
+        with:
+          provider: 'mock'
+          comment: 'false'
+          summary: 'true'

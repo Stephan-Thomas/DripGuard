@@ -127,3 +127,15 @@ Where $s_i$ is the percentage share of total funding allocated to recipient $i$,
 1. **Manifest Parsing without Script Execution**: Parsers read files as static data structures. No `npm`, `cargo`, or `pip` processes are spawned.
 2. **Untrusted Pull Request Safety**: PR runs execute strictly read-only against the repository manifests.
 3. **No Secret Leakage**: Tokens and credentials are scrubbed from all terminal outputs, error messages, and reports.
+
+---
+
+## 6. GitHub Action Hermetic Packaging
+
+GitHub Marketplace actions executed via `uses: owner/repo@v1` do not invoke package managers (`pnpm install`) in consumer repositories. To deliver a seamless, zero-dependency experience:
+
+- **Single Bundle Compilation**: `src/action.ts` and all its transitive dependencies (including `@actions/core`, `@actions/github`, `@noble/hashes`, and internal modules) are compiled via `esbuild` into a single, optimized CommonJS bundle: `dist/action.cjs`.
+- **Repository Tracking**: Unlike transient build artifacts, `dist/action.cjs` is explicitly un-ignored (`!dist/action.cjs`) and tracked in git.
+- **Bytecode Consistency Verification**: CI enforces that `dist/action.cjs` is never committed out of sync with the underlying TypeScript source tree.
+- **Node 20 Runtime**: The action runs directly on GitHub-hosted Ubuntu, Windows, and macOS runners using GitHub Actions' built-in `node20` environment without external container overhead.
+

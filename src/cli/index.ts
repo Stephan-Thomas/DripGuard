@@ -21,7 +21,7 @@ export function createCli(): Command {
   program
     .name('dripguard')
     .description('Detect drift between open-source software dependencies and Drips funding graphs')
-    .version('0.1.0');
+    .version('1.0.0');
 
   // Command 1: check
   program

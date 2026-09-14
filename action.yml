@@ -1,5 +1,5 @@
 name: 'DripGuard'
-description: 'Continuous CI verification and CLI linter detecting drift between software dependencies and Drips funding graphs'
+description: 'Detect drift between your software dependencies and Drips funding policy in CI'
 author: 'Stephan Thomas'
 branding:
   icon: 'shield'
@@ -19,15 +19,15 @@ inputs:
     required: false
     default: '.dripguard-baseline.json'
   provider:
-    description: 'Funding provider mode ("live" or "mock")'
+    description: 'Funding provider mode ("live" for real Drips on-chain data, or "mock" for deterministic offline fixtures)'
     required: false
-    default: 'mock'
+    default: 'live'
   comment:
-    description: 'Whether to post or update a single persistent comment on pull requests'
+    description: 'Whether to post or update a single persistent comment on pull requests (requires pull-requests: write)'
     required: false
     default: 'true'
   summary:
-    description: 'Whether to append rich summary to $GITHUB_STEP_SUMMARY'
+    description: 'Whether to append rich Markdown summary to $GITHUB_STEP_SUMMARY'
     required: false
     default: 'true'
   format:
@@ -53,4 +53,4 @@ outputs:
 
 runs:
   using: 'node20'
-  main: 'dist/action.js'
+  main: 'dist/action.cjs'

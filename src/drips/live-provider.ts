@@ -145,26 +145,37 @@ export class LiveDripsFundingProvider implements DripsFundingProvider {
 
       const rawStreams = data?.project?.streams || [];
       for (const st of rawStreams) {
+        const meta = resolveTokenMetadata(st.tokenAddress, st.token || st.totalFunded?.symbol, st.totalFunded?.decimals);
+
         let totalFunded: FundingAmount | undefined;
         if (st.totalFunded) {
           const raw = String(st.totalFunded.raw || '0');
-          const decimals = Number(st.totalFunded.decimals || 18);
+          const human = formatTokenAmount(raw, meta.decimals);
+
+          // Only derive USD for verified 1:1 USD stablecoins; do not fabricate USD for volatile tokens
+          let derivedUsd: number | undefined;
+          if (meta.symbol === 'DAI' || meta.symbol === 'USDC' || meta.symbol === 'USDT') {
+            const parsed = parseFloat(human);
+            if (!isNaN(parsed)) derivedUsd = parsed;
+          }
+
           totalFunded = {
             raw,
-            decimals,
-            symbol: st.totalFunded.symbol || 'DAI',
-            tokenAddress: st.tokenAddress,
-            chainId: st.chainId || 1,
-            humanAmount: formatTokenAmount(raw, decimals)
+            decimals: meta.decimals,
+            symbol: meta.symbol,
+            tokenAddress: meta.tokenAddress,
+            chainId: st.chainId,
+            humanAmount: human,
+            derivedUsd
           };
         }
 
         streams.push({
           sender: st.sender,
           receiver: st.receiver,
-          token: st.token || 'DAI',
-          tokenAddress: st.tokenAddress,
-          chainId: st.chainId || 1,
+          token: meta.symbol || st.token || (st.tokenAddress ? `ERC20(${st.tokenAddress.substring(0, 8)}...)` : 'UNKNOWN'),
+          tokenAddress: meta.tokenAddress,
+          chainId: st.chainId,
           ratePerSecond: st.ratePerSecond,
           totalFunded,
           source: 'stream'
@@ -215,7 +226,7 @@ export class LiveDripsFundingProvider implements DripsFundingProvider {
 
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
-          'User-Agent': 'DripGuard/0.1.0'
+          'User-Agent': 'DripGuard/1.0.0'
         };
         if (this.apiKey) {
           headers['Authorization'] = `Bearer ${this.apiKey}`;
@@ -265,3 +276,52 @@ function formatTokenAmount(raw: string, decimals: number): string {
     return '0';
   }
 }
+
+interface TokenMetadata {
+  tokenAddress?: string;
+  symbol: string;
+  decimals: number;
+}
+
+const KNOWN_TOKENS: Record<string, { symbol: string; decimals: number }> = {
+  // Mainnet
+  '0x6b175474e89094c44da98b954eedeac495271d0f': { symbol: 'DAI', decimals: 18 },
+  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48': { symbol: 'USDC', decimals: 6 },
+  '0xdac17f958d2ee523a2206206994597c13d831ec7': { symbol: 'USDT', decimals: 6 },
+  '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2': { symbol: 'WETH', decimals: 18 },
+  // Optimism
+  '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': { symbol: 'DAI', decimals: 18 },
+  '0x0b2c639c533813f4aa9d7837caf62653d097ff85': { symbol: 'USDC', decimals: 6 },
+  '0x94b008aa00579c1307b0ef2c499ad98a8ce58e58': { symbol: 'USDT', decimals: 6 },
+  '0x4200000000000000000000000000000000000006': { symbol: 'WETH', decimals: 18 },
+  // Base
+  '0x50c5725949a6f0c72e6c4a641f24049a917db0cb': { symbol: 'DAI', decimals: 18 },
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { symbol: 'USDC', decimals: 6 },
+  '0xfde4c96c8593536e31f229ea8f37b2ada2699bb2': { symbol: 'USDT', decimals: 6 }
+};
+
+function resolveTokenMetadata(
+  tokenAddress?: string,
+  hintSymbol?: string,
+  hintDecimals?: number
+): TokenMetadata {
+  const normAddr = tokenAddress?.toLowerCase();
+  if (normAddr && KNOWN_TOKENS[normAddr]) {
+    const known = KNOWN_TOKENS[normAddr];
+    return {
+      tokenAddress,
+      symbol: hintSymbol || known.symbol,
+      decimals: hintDecimals !== undefined && !isNaN(hintDecimals) ? hintDecimals : known.decimals
+    };
+  }
+
+  const symbol = hintSymbol || (tokenAddress ? `TOKEN(${tokenAddress.slice(0, 6)}...)` : 'DAI');
+  const decimals = hintDecimals !== undefined && !isNaN(hintDecimals) ? hintDecimals : 18;
+
+  return {
+    tokenAddress,
+    symbol,
+    decimals
+  };
+}
+

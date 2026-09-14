@@ -32,7 +32,7 @@ jobs:
         uses: Stephan-Thomas/DripGuard@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          provider: 'mock' # Use 'live' for real on-chain queries
+          provider: 'live' # Default is 'live'; use 'mock' for offline sandbox testing
           comment: 'true'
           summary: 'true'
           format: 'text'
@@ -47,7 +47,7 @@ jobs:
 | `github-token` | Token for updating pull request comments | `${{ github.token }}` |
 | `config` | Path to `.drips.yml` configuration file | `.drips.yml` |
 | `baseline` | Path to baseline file for diff mode | `.dripguard-baseline.json` |
-| `provider` | Provider mode (`live` or `mock`) | `mock` |
+| `provider` | Provider mode (`live` for real on-chain Drips, or `mock` for deterministic test fixtures) | `live` |
 | `comment` | Update a persistent comment on PRs | `true` |
 | `summary` | Write report to `$GITHUB_STEP_SUMMARY` | `true` |
 | `format` | Output report format (`text`, `json`, `sarif`) | `text` |

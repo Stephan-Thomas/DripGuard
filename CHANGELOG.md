@@ -5,6 +5,17 @@ All notable changes to DripGuard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-09-14
+
+### Added
+- **GitHub Marketplace Release**: Hardened and certified for GitHub Marketplace v1.0.0 with official branding (`shield`, `blue`).
+- **Self-Contained Action Bundle**: Zero-install standalone bundle `dist/action.cjs` compiled via `esbuild` for Node 20 runners.
+- **CI Dist Consistency Guard**: Automatic CI verification preventing unbundled drift between TypeScript source and distribution bytecode.
+- **Production Provider Isolation**: Action metadata and CLI default to `live` Drips network queries. Mock mode is strictly opt-in for testing.
+- **Strict "No Fake Live Data"**: Live network failures return exit code 3 (`PROVIDER_UNAVAILABLE`) with explicit errors rather than falling back to mocks or fabricating synthetic token valuations.
+- **Stablecoin Valuation Engine**: Token amounts are formatted according to on-chain decimals, and USD valuations are computed only for verified 1:1 USD stablecoins (DAI, USDC, USDT).
+- **Least-Privilege Security**: Action defaults to pure read-only (`contents: read`), reserving `pull-requests: write` exclusively when PR commenting is requested.
+
 ## [0.1.0] - 2026-09-14
 
 ### Added

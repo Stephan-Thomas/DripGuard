@@ -1,5 +1,10 @@
 # DripGuard
 
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-DripGuard-blue?logo=github&style=flat-square)](https://github.com/marketplace/actions/dripguard)
+[![Release](https://img.shields.io/badge/release-v1.0.0-green?style=flat-square)](https://github.com/Stephan-Thomas/DripGuard/releases/tag/v1.0.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+[![CI](https://github.com/Stephan-Thomas/DripGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/Stephan-Thomas/DripGuard/actions/workflows/ci.yml)
+
 A funding-supply-chain linter for open source.
 
 **DripGuard detects drift between an open-source project's software dependency graph and its Drips funding graph.**
@@ -209,22 +214,57 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write # Required only for PR commenting
+  pull-requests: write # Required only if comment: 'true' is enabled
 
 jobs:
   verify-funding:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Run DripGuard
+      - name: Run DripGuard Check
         uses: Stephan-Thomas/DripGuard@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          provider: 'mock' # Use 'live' for real on-chain queries
+          provider: 'live' # Default is 'live'; use 'mock' for offline sandbox testing
           comment: 'true'
           summary: 'true'
 ```
+
+### Action Permissions Matrix
+
+| Permission | Scope | Required? | Why It's Needed |
+|:---|:---|:---:|:---|
+| `contents: read` | Repository | **Always** | To read dependency manifests (`package.json`, `Cargo.toml`, etc.) and `.drips.yml`. |
+| `pull-requests: write` | Pull Requests | **Optional** | Only needed when `comment: 'true'` to post/update the sticky funding health comment. |
+| `security-events: write` | Code Scanning | **Optional** | Only needed when uploading SARIF reports (`format: 'sarif'`) to GitHub Code Scanning. |
+
+> [!NOTE]
+> If your organization disallows `pull-requests: write`, simply set `comment: 'false'`. DripGuard will run in pure read-only mode (`contents: read`) and publish the full interactive report directly to the GitHub Action **Step Summary**!
+
+### Action Inputs
+
+| Input | Description | Default |
+|:---|:---|:---:|
+| `provider` | Provider mode: `'live'` (queries Drips GraphQL API) or `'mock'` (offline fixtures) | `'live'` |
+| `config` | Path to `.drips.yml` configuration file | `'.drips.yml'` |
+| `baseline` | Path to baseline file (`.dripguard-baseline.json`) for diff mode | `'.dripguard-baseline.json'` |
+| `comment` | Post or update sticky Markdown report comment on PRs | `'true'` |
+| `summary` | Append rich Markdown summary to `$GITHUB_STEP_SUMMARY` | `'true'` |
+| `format` | Output report format (`'text'`, `'json'`, `'sarif'`) | `'text'` |
+| `working-directory` | Path of repository directory to inspect | `'.'` |
+| `github-token` | GitHub token for PR comments | `${{ github.token }}` |
+
+### Action Outputs
+
+| Output | Type | Description |
+|:---|:---:|:---|
+| `status` | string | Evaluation outcome: `'pass'`, `'fail'`, or `'warn'` |
+| `coverage-percent` | string | Overall percentage of dependencies with verified funding coverage |
+| `violations-count` | string | Number of policy violations detected |
+| `unfunded-count` | string | Number of unfunded dependencies discovered |
+| `report-path` | string | Absolute path to the generated `dripguard-report.json` |
 
 ### Pull Request Comment Experience
 DripGuard creates or updates a **single persistent comment** across PR revisions without spamming:

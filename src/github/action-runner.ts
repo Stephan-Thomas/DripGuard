@@ -13,9 +13,12 @@ export async function runGitHubAction(): Promise<void> {
     const workingDir = core.getInput('working-directory') || process.cwd();
     const configPath = core.getInput('config') || undefined;
     const baselinePath = core.getInput('baseline') || undefined;
-    const providerMode = (core.getInput('provider') || 'mock').toLowerCase() as 'live' | 'mock';
-    const commentOnPr = core.getBooleanInput('comment') ?? true;
-    const createSummary = core.getBooleanInput('summary') ?? true;
+    const providerInput = (core.getInput('provider') || 'live').trim().toLowerCase();
+    const providerMode = providerInput === 'mock' ? 'mock' : 'live';
+    const commentInput = core.getInput('comment');
+    const commentOnPr = commentInput !== '' ? commentInput.toLowerCase() !== 'false' : true;
+    const summaryInput = core.getInput('summary');
+    const createSummary = summaryInput !== '' ? summaryInput.toLowerCase() !== 'false' : true;
     const format = core.getInput('format') || 'text';
     const githubToken = core.getInput('github-token') || process.env.GITHUB_TOKEN;
 
@@ -58,7 +61,7 @@ export async function runGitHubAction(): Promise<void> {
     }
 
     // Write to GitHub Step Summary
-    if (createSummary) {
+    if (createSummary && process.env.GITHUB_STEP_SUMMARY) {
       const markdown = formatMarkdownReport(result);
       await core.summary.addRaw(markdown).write();
     }
