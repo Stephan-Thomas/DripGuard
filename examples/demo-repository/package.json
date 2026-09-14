@@ -1,0 +1,14 @@
+{
+  "name": "demo-repository",
+  "version": "1.0.0",
+  "description": "Example project demonstrating DripGuard continuous funding policy verification",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "zod": "^3.22.4",
+    "@opentelemetry/api": "^1.7.0"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
+  }
+}

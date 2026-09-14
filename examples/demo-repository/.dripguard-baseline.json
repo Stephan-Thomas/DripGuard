@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "timestamp": "2026-09-10T12:00:00.000Z",
+  "repository": "Stephan-Thomas/demo-repository",
+  "coveragePercent": 100,
+  "dependencies": [
+    {
+      "name": "react",
+      "ecosystem": "npm",
+      "version": "^18.2.0",
+      "direct": true,
+      "dev": false,
+      "project": {
+        "forge": "github",
+        "owner": "facebook",
+        "repository": "react",
+        "url": "https://github.com/facebook/react"
+      }
+    },
+    {
+      "name": "zod",
+      "ecosystem": "npm",
+      "version": "^3.22.4",
+      "direct": true,
+      "dev": false,
+      "project": {
+        "forge": "github",
+        "owner": "colinhacks",
+        "repository": "zod",
+        "url": "https://github.com/colinhacks/zod"
+      }
+    },
+    {
+      "name": "serde",
+      "ecosystem": "cargo",
+      "version": "1.0",
+      "direct": true,
+      "dev": false,
+      "project": {
+        "forge": "github",
+        "owner": "serde-rs",
+        "repository": "serde",
+        "url": "https://github.com/serde-rs/serde"
+      }
+    }
+  ]
+}

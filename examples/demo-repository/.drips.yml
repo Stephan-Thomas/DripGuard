@@ -1,0 +1,40 @@
+version: 1
+
+project:
+  github: Stephan-Thomas/demo-repository
+
+dependencies:
+  include:
+    - runtime
+    - direct
+  exclude:
+    - dev
+
+funding:
+  minimum_dependency_coverage: 90
+  max_single_recipient_share: 70
+  max_concentration_hhi: 3500
+
+policy:
+  fail_on:
+    - new_unfunded_dependency
+    - insufficient_coverage
+  warn_on:
+    - stale_funding
+    - unresolved_dependency
+    - concentration
+
+exceptions:
+  allowed_unfunded:
+    demo-rust-helper:
+      reason: "Internal workspace crate"
+
+resolutions:
+  npm:
+    "@opentelemetry/api":
+      github: open-telemetry/opentelemetry-js
+
+output:
+  comment_on_pull_request: true
+  create_summary: true
+  format: text

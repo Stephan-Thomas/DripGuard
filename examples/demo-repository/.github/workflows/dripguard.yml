@@ -1,0 +1,28 @@
+name: DripGuard Funding Drift Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify:
+    name: Verify Drips Funding Alignment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run DripGuard Check
+        uses: Stephan-Thomas/DripGuard@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          provider: 'mock'
+          comment: 'true'
+          summary: 'true'

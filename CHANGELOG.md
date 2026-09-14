@@ -1,0 +1,19 @@
+# Changelog
+
+All notable changes to DripGuard will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-09-14
+
+### Added
+- Multi-ecosystem static dependency discovery for `npm`, `Cargo`, `Go`, and `Python` (supporting manifests and lockfiles).
+- Canonical project resolution pipeline separating Package Identity, Repository Identity, and Drips Identity.
+- Drips protocol client implementing exact on-chain `RepoDriver.calcAccountId` derivation.
+- Live GraphQL Drips funding provider and deterministic offline Mock provider with strict "No Fake Live Data" guarantees.
+- Deterministic policy engine supporting coverage thresholds, drift detection, stale allocation candidates, concentration HHI, and scoped funding requirements.
+- CLI application providing `check`, `diff`, `dependencies`, `funding`, `explain`, `init`, and `validate` commands.
+- Standardized, machine-readable exit codes (0 = Pass, 1 = Policy Violation, 2 = Config Error, 3 = Provider Unavailable, 4 = Fatal).
+- GitHub Action integration with least-privilege permissions, single persistent PR comment updates, and Step Summaries.
+- Comprehensive documentation, 6 Architecture Decision Records (ADR), and extensive test suite (100% passing).

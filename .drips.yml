@@ -1,0 +1,66 @@
+# DripGuard Configuration (.drips.yml)
+# Continuous CI verification between software dependencies and Drips funding graphs
+version: 1
+
+project:
+  # The canonical GitHub owner/repository for this project
+  github: Stephan-Thomas/DripGuard
+
+dependencies:
+  # Categories of dependencies to include in funding coverage evaluation
+  include:
+    - runtime
+    - direct
+
+  # Categories of dependencies excluded by default
+  exclude:
+    - dev
+    - optional
+
+funding:
+  # Minimum percentage of dependencies with verified Drips funding
+  minimum_dependency_coverage: 90
+
+  # Strict 100% funding policy for direct runtime dependencies (optional)
+  minimum_direct_dependency_coverage: 100
+
+  # Maximum percentage of funding that can go to any single recipient project
+  max_single_recipient_share: 70
+
+  # Maximum Herfindahl-Hirschman Index (0-10000) to avoid excessive funding concentration
+  max_concentration_hhi: 2500
+
+policy:
+  # Violations that trigger CLI exit code 1 / CI failure
+  fail_on:
+    - new_unfunded_dependency
+    - insufficient_coverage
+    - concentration
+
+  # Warnings surfaced in PR comments and terminal output
+  warn_on:
+    - stale_funding
+    - unresolved_dependency
+
+exceptions:
+  # Packages explicitly allowed to remain unfunded (with optional maintainer explanation)
+  allowed_unfunded:
+    # example-internal-pkg:
+    #   reason: "In-house development helper not eligible for public Drips funding"
+
+  # Projects excluded from drift and coverage checks
+  ignored_projects: []
+
+# Manual package-to-repository resolution mappings (override automatic resolution)
+resolutions:
+  # npm:
+  #   "@opentelemetry/api":
+  #     github: open-telemetry/opentelemetry-js
+
+output:
+  # Update a single persistent PR comment in CI
+  comment_on_pull_request: true
+  # Add rich Markdown summary to GitHub Actions Step Summary ($GITHUB_STEP_SUMMARY)
+  create_summary: true
+  # Default output format: text | json | sarif
+  format: text

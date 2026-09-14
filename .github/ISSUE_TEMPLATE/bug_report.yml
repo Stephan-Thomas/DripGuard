@@ -1,0 +1,28 @@
+name: Bug Report
+description: Create a report to help us fix a bug in DripGuard
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug!
+  - type: input
+    id: version
+    attributes:
+      label: DripGuard Version
+      placeholder: e.g. 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      placeholder: A clear description of what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction Steps
+      placeholder: Commands, manifests, or .drips.yml configuration used.
+    validations:
+      required: true
