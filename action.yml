@@ -1,4 +1,4 @@
-name: 'DripGuard'
+name: 'DripGuard Funding Linter'
 description: 'Detect drift between your software dependencies and Drips funding policy in CI'
 author: 'Stephan Thomas'
 branding:
