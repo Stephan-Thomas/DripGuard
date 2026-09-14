@@ -1,0 +1,56 @@
+name: 'DripGuard'
+description: 'Continuous CI verification and CLI linter detecting drift between software dependencies and Drips funding graphs'
+author: 'Stephan Thomas'
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for updating pull request comments (e.g. secrets.GITHUB_TOKEN)'
+    required: false
+    default: '${{ github.token }}'
+  config:
+    description: 'Path to .drips.yml policy configuration file'
+    required: false
+    default: '.drips.yml'
+  baseline:
+    description: 'Path to baseline file (.dripguard-baseline.json) for diff mode comparison'
+    required: false
+    default: '.dripguard-baseline.json'
+  provider:
+    description: 'Funding provider mode ("live" or "mock")'
+    required: false
+    default: 'mock'
+  comment:
+    description: 'Whether to post or update a single persistent comment on pull requests'
+    required: false
+    default: 'true'
+  summary:
+    description: 'Whether to append rich summary to $GITHUB_STEP_SUMMARY'
+    required: false
+    default: 'true'
+  format:
+    description: 'Output format ("text", "json", or "sarif")'
+    required: false
+    default: 'text'
+  working-directory:
+    description: 'Directory path of the repository to inspect'
+    required: false
+    default: '.'
+
+outputs:
+  status:
+    description: 'Evaluation result status: "pass", "fail", or "warn"'
+  coverage-percent:
+    description: 'Overall percentage of dependencies with verified funding coverage'
+  violations-count:
+    description: 'Count of policy violations detected'
+  unfunded-count:
+    description: 'Count of unfunded dependencies'
+  report-path:
+    description: 'Filepath to the generated JSON report'
+
+runs:
+  using: 'node20'
+  main: 'dist/action.js'
