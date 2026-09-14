@@ -1,0 +1,67 @@
+{
+  "name": "dripguard",
+  "version": "0.1.0",
+  "description": "Continuous CI verification and CLI linter detecting drift between software dependencies and Drips funding graphs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "dripguard": "./bin/dripguard.js"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "bin",
+    "action.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rimraf dist coverage",
+    "prepublishOnly": "npm run build && npm run test"
+  },
+  "keywords": [
+    "drips",
+    "funding",
+    "dependencies",
+    "supply-chain",
+    "linter",
+    "cli",
+    "github-action",
+    "oss-funding",
+    "repodriver"
+  ],
+  "author": "Stephan Thomas <stephan@dripguard.dev>",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0",
+    "@noble/hashes": "^1.7.1",
+    "commander": "^13.1.0",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.7.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "@vitest/coverage-v8": "^3.0.7",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stephan-Thomas/DripGuard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Stephan-Thomas/DripGuard/issues"
+  },
+  "homepage": "https://github.com/Stephan-Thomas/DripGuard#readme"
+}
